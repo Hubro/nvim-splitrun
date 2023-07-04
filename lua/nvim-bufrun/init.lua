@@ -1,5 +1,5 @@
 local M = {
-  buffer_name_fmt = "[Bufrun #%s]",
+  buffer_name_fmt = "[Splitrun #%s]",
   buffer_counter = 1,
 }
 
@@ -15,14 +15,14 @@ function M.setup(_)
 end
 
 function M.define_commands()
-  vim.api.nvim_create_user_command("Bufrun", function(command)
-    M.bufrun(command.args)
+  vim.api.nvim_create_user_command("Splitrun", function(command)
+    M.splitrun(command.args)
   end, {
     nargs = "+",
   })
 end
 
-function M.bufrun(command)
+function M.splitrun(command)
   local w = vim.api.nvim_win_get_width(0)
   local h = vim.api.nvim_win_get_height(0)
   local split_command

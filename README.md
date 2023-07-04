@@ -1,5 +1,5 @@
 
-# nvim-bufrun
+# nvim-splitrun
 
 Extremely simple plugin for running a command and displaying the output in a
 new split. The command is run with `:terminal`, so colors are kept.
@@ -13,5 +13,5 @@ as `cargo test` or `npm run test`.
 Usage example:
 
 ```
-nnoremap <F5> :Bufrun cargo test<CR>
+nnoremap <F5> :Splitrun cargo test<CR>
 ```
