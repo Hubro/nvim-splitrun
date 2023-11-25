@@ -30,15 +30,25 @@ function M.define_commands()
   end, {
     nargs = "+",
   })
+
+  vim.api.nvim_create_user_command("SplitrunNew", function(command)
+    M.splitrun(command.args, { new_split = true })
+  end, {
+    nargs = "+",
+  })
 end
 
 function M.splitrun(command, opts)
   opts = opts or {}
-  opts.reuse_split = opts.reuse_split or false
+  opts.new_split = opts.new_split or false
 
   local win = M.prev_win
 
-  if win == nil or opts.reuse_split == false or not vim.api.nvim_win_is_valid(win) then
+  if
+    win == nil
+    or not vim.api.nvim_win_is_valid(win)
+    or opts.new_split == true
+  then
     local w = vim.api.nvim_win_get_width(0)
     local h = vim.api.nvim_win_get_height(0)
     local split_command
