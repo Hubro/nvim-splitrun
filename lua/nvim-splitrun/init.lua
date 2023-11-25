@@ -10,6 +10,16 @@ BUFFER_OPTIONS = {
   buflisted = false,
 }
 
+local function delete_alt(buf)
+  local alt = vim.api.nvim_buf_call(buf, function()
+    ---@diagnostic disable-next-line: redundant-return-value, param-type-mismatch
+    return vim.fn.bufnr("#")
+  end)
+  if alt ~= buf and alt ~= -1 then
+    pcall(vim.api.nvim_buf_delete, alt, { force = true })
+  end
+end
+
 function M.setup(_)
   M.define_commands()
 end
@@ -22,32 +32,32 @@ function M.define_commands()
   })
 end
 
-function M.splitrun(command)
-  local w = vim.api.nvim_win_get_width(0)
-  local h = vim.api.nvim_win_get_height(0)
-  local split_command
+function M.splitrun(command, opts)
+  opts = opts or {}
+  opts.reuse_split = opts.reuse_split or false
 
-  local function delete_alt(buf)
-    local alt = vim.api.nvim_buf_call(buf, function()
-      ---@diagnostic disable-next-line: redundant-return-value, param-type-mismatch
-      return vim.fn.bufnr("#")
-    end)
-    if alt ~= buf and alt ~= -1 then
-      pcall(vim.api.nvim_buf_delete, alt, { force = true })
+  local win = M.prev_win
+
+  if win == nil or opts.reuse_split == false or not vim.api.nvim_win_is_valid(win) then
+    local w = vim.api.nvim_win_get_width(0)
+    local h = vim.api.nvim_win_get_height(0)
+    local split_command
+
+    if (w / 2) > h then -- Assumes the height of a cell is approx 2x the width
+      split_command = "vsplit"
+    else
+      split_command = "split"
     end
+
+    vim.cmd(split_command)
+
+    win = vim.api.nvim_get_current_win()
+    M.prev_win = win
   end
 
-  if (w / 2) > h then -- Assumes the height of a cell is approx 2x the width
-    split_command = "vsplit"
-  else
-    split_command = "split"
-  end
-
-  vim.cmd(split_command)
-
-  local win = vim.api.nvim_get_current_win()
-
-  vim.cmd("terminal " .. command)
+  vim.api.nvim_win_call(win, function()
+    vim.cmd("terminal " .. command)
+  end)
 
   local buf = vim.api.nvim_win_get_buf(win)
 
