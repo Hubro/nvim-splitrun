@@ -84,7 +84,7 @@ function M.splitrun(command, opts)
   end, { buffer = buf })
 
   for option, value in pairs(BUFFER_OPTIONS) do
-    vim.api.nvim_buf_set_option(buf, option, value)
+    vim.api.nvim_set_option_value(option, value, { buf = buf })
   end
 
   M.buffer_counter = M.buffer_counter + 1
