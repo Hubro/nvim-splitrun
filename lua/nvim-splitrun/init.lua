@@ -1,3 +1,7 @@
+---@class SplitrunOptions
+---@field new_split boolean?
+---@field focus boolean?
+
 local M = {
   buffer_name_fmt = "[Splitrun #%s]",
   buffer_counter = 1,
@@ -38,22 +42,25 @@ function M.define_commands()
   })
 end
 
+---@param command any
+---@param opts SplitrunOptions?
 function M.splitrun(command, opts)
   opts = opts or {}
   opts.new_split = opts.new_split or false
+  opts.focus = opts.focus or true
 
   local win = M.prev_win
 
   if
-    win == nil
-    or not vim.api.nvim_win_is_valid(win)
-    or opts.new_split == true
+      win == nil
+      or not vim.api.nvim_win_is_valid(win)
+      or opts.new_split == true
   then
     local w = vim.api.nvim_win_get_width(0)
     local h = vim.api.nvim_win_get_height(0)
     local split_command
 
-    if (w / 2) > h then -- Assumes the height of a cell is approx 2x the width
+    if (w / 2.5) > h then -- Assumes the height of a cell is approx 2.5x the width
       split_command = "vsplit"
     else
       split_command = "split"
@@ -88,6 +95,11 @@ function M.splitrun(command, opts)
   end
 
   M.buffer_counter = M.buffer_counter + 1
+
+  if opts.focus then
+    vim.api.nvim_set_current_win(win)
+    vim.cmd.startinsert()
+  end
 end
 
 return M
